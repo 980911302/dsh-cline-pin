@@ -1,0 +1,18 @@
+# dsh bundle patch：挂载 Cline Pass 钉住渠道的 provider。
+#
+# 开箱即用：网关 https://api.cline.bot/api/v1，路由名 cline-pin，密钥从凭据名
+# CLINE_PASS_API_KEY 解析。要改任何配置，写进你自己 profile 的
+# $DSH_HOME/profiles/<name>/cordis.patch.yml（它在所有 bundle 之后应用，且会整体替换
+# 同 id 那一行的 config，所以要写全）。例如：
+#
+# - id: cline-pin
+#   config:
+#     enforce: true
+#     perModel:
+#       cline-pass/kimi-k3:
+#         upstreams: [baseten, alibaba]
+#         pinMode: strict
+
+- insert:
+    - id: cline-pin
+      name: dsh-cline-pin

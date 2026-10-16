@@ -1,0 +1,61 @@
+{
+  "name": "dsh-cline-pin",
+  "version": "0.2.2",
+  "description": "Cline Pass provider for DeepSeek Harness (dsh) with automatic upstream-channel pinning: paste the key in Settings > Models, models are fetched and each one is locked to its channel after first use. Also strict/preferred pins, exclusions, failover before the first token, and read-back verification.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./pin": "./lib/pin.js",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "bin": {
+    "cline-pin": "bin/cline-pin.mjs"
+  },
+  "files": [
+    "lib",
+    "bin",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/pin.test.mjs test/wire.test.mjs test/log.test.mjs test/gateway.test.mjs test/panel.test.mjs test/state.test.mjs test/image.test.mjs",
+    "test:e2e": "node test/e2e.mjs"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "dsh-bundle",
+    "deepseek-harness",
+    "llm-provider",
+    "cline-pass",
+    "cline",
+    "openrouter",
+    "vercel-ai-gateway"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.3.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-connection"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-credentials": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-launch-environment": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-llm": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/schemastery": "^3.18.1"
+  }
+}

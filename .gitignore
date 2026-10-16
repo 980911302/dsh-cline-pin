@@ -1,0 +1,5 @@
+node_modules/
+*.tgz
+remote-state.json
+desktop-cordis.patch.yml
+.DS_Store
