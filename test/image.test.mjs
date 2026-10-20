@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { DEFAULT_MODELS, KNOWN_WINDOWS, modalitiesFor } from '../lib/models.js'
 import {
   collectImageRefs,
   contentHasImage,
@@ -47,4 +48,13 @@ test('prepareRequestImages：没有附件服务时明确报错，不把图片静
     () => prepareRequestImages([{ role: 'user', content: [{ type: 'image', attachment: ref }] }], undefined, undefined),
     /附件服务/,
   )
+})
+
+// 1017 是网关发布的新 ID，不能退回未知模型的纯文本能力。
+test('DeepSeek V4.1 Flash 1017 可选择并支持图片，保留 1M 上下文', () => {
+  const id = 'cline-pass/deepseek-v4.1-flash-1017'
+  assert.ok(DEFAULT_MODELS.includes(id))
+  assert.deepEqual(modalitiesFor(id), ['text', 'image'])
+  assert.equal(KNOWN_WINDOWS[id], 1_000_000)
+  assert.deepEqual(modalitiesFor('cline-pass/unknown-model'), ['text'])
 })

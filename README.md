@@ -71,8 +71,9 @@ Cline Pass 的一个模型背后通常有好几个上游渠道（比如 `baseten
 |---|---|---|
 | `perModel` | `{}` | 上面的钉住配置，按模型 id 分别写 |
 | `enforce` | `false` | 开启后，网关没遵守钉住（换了别的渠道）就在交出任何内容之前放弃这次尝试，换下一个候选；全部候选都不行就报错 `PIN_NOT_HONORED` |
-| `knownModels` | 官方当前的 14 个 | 在模型列表里出现的模型 id |
-| `models` | `{}` | 单个模型的覆盖：`name`、`contextWindow`、`maxTokens` |
+| `knownModels` | 内置 15 个，设置页可刷新 | 在模型列表里出现的模型 id |
+| `models` | `{}` | 单个模型的覆盖：`name`、`contextWindow`、`maxTokens`、`reasoning`、`defaultReasoningEffort` |
+| `reasoningModels` | `true` | 为已知推理模型提供思考强度选择；可用单个模型的 `reasoning` 覆盖 |
 | `defaultContextWindow` | `128000` | 没单独指定时的上下文窗口（官方标明 1M 的 4 个模型已内置） |
 | `defaultMaxTokens` | `32000` | 单次回答的输出上限 |
 | `logFile` | `''` | 请求日志；空 = `~/.dsh/logs/cline-pin.log`，`off` = 不写，也可写具体路径 |
@@ -80,6 +81,24 @@ Cline Pass 的一个模型背后通常有好几个上游渠道（比如 `baseten
 | `apiKeyEnv` | `CLINE_PASS_API_KEY` | 密钥的凭据名 |
 | `streamIdleTimeoutMs` | `300000` | 流式响应多久没数据就算超时 |
 | `provider` / `displayName` | `cline-pin` / `Cline Pass (Pin)` | provider 路由名与显示名 |
+
+### 思考模式与强度
+
+在聊天输入框底部点击模型名称，再打开「推理等级」。DeepSeek V4.1 Flash（包括 1017）和 V4 Pro 提供 **Off / Low / High / Max**，默认 **High**。Off 会显式关闭思考；Max 会按最高强度发送，不再降为 High。切换后从下一次请求生效。
+
+DeepSeek 的实际档位见[官方思考模式文档](https://api-docs.deepseek.com/zh-cn/guides/thinking_mode/)；已有配置中的 `medium` / `xhigh` 按 High 处理，`minimal` 按 Low，`ultra` 按 Max。
+
+要覆盖默认强度，在 profile 的 `cordis.patch.yml` 中添加（已有 `cline-pin` 条目时合并到其完整配置）：
+
+```yaml
+- id: cline-pin
+  name: dsh-cline-pin
+  config:
+    models:
+      cline-pass/deepseek-v4.1-flash-1017:
+        reasoning: true
+        defaultReasoningEffort: high
+```
 
 ## 怎么知道渠道叫什么
 
@@ -128,7 +147,7 @@ ts=2026-10-15T13:51:11.002Z model=cline-pass/kimi-k3 want=alibaba got=Alibaba ve
 ## 已知限制
 
 - **`enforce` 并不总能拦住**：它只能在"交出第一块内容之前"生效，前提是网关在最早的几帧里就带了渠道标记。按 dsh-cline-pass 的观察，OpenRouter 路由每一帧都带 `provider`；Vercel 路由的标记可能要到流的末尾才出现，这时请求已经在输出了，只能事后在日志里记成 `missed`。**没有拿真实的 Cline Pass 密钥验证过**，上面的行为是对着一个本地模拟网关测的，真实网关的细节以你的日志为准。
-- **图片输入**：DeepSeek V4.1 Flash、GLM-5.3 Flash、Kimi K3、MiniMax-M3、Qwen3.8 Max、Qwen3.7 Plus、MiMo-V2.5 声明为支持图片；其它模型仍按纯文本声明，避免把图片块发给不支持的上游。
+- **图片输入**：DeepSeek V4.1 Flash（包括 1017）、GLM-5.3 Flash、Kimi K3、MiniMax-M3、Qwen3.8 Max、Qwen3.7 Plus、MiMo-V2.5 声明为支持图片；其它模型仍按纯文本声明，避免把图片块发给不支持的上游。
 - **单账号**：没有账号池，也没有并发上限。要这些请用功能更全的 [dsh-cline-pass](https://github.com/yhshzh/dsh-cline-pass)。
 - 默认模型清单和上下文窗口取自 2026-10-15 的官方公开清单；之后新增模型用 `cline-pin models` 重新生成 `knownModels`。
 - 只在 dsh `0.2.0-rc.2` 上验证过，声明兼容 `>=0.2.0-rc.2 <0.3.0`。

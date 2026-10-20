@@ -113,6 +113,18 @@ const failureOf = (result) => {
 }
 
 const scenarios = [
+  ...['off', 'low', 'high', 'max', 'medium'].map((effort) => ({
+    name: `1017 思考强度 ${effort}：真实宿主解析模型能力并向网关发送对应参数`,
+    model: 'cline-pass/deepseek-v4.1-flash-1017',
+    config: { models: { 'cline-pass/deepseek-v4.1-flash-1017': { reasoning: true, defaultReasoningEffort: effort } } },
+    async check({ result }) {
+      assert.equal(failureOf(result), undefined)
+      assert.equal(finalText(result), 'Hello from deepseek')
+      const [request] = mainRequests()
+      assert.equal(request.body.reasoning_effort, effort === 'off' ? 'none' : effort === 'medium' ? 'high' : effort)
+      assert.deepEqual(request.body.thinking, { type: effort === 'off' ? 'disabled' : 'enabled' })
+    },
+  })),
   {
     name: 'strict 钉住：两种拼法都发到网关，回答来自钉住的渠道，日志记为 adopted',
     config: { perModel: { [MODEL]: { upstreams: ['baseten', 'alibaba'], pinMode: 'strict' } } },

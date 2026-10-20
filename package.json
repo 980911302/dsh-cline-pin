@@ -1,6 +1,6 @@
 {
   "name": "dsh-cline-pin",
-  "version": "0.2.2",
+  "version": "0.2.4",
   "description": "Cline Pass provider for DeepSeek Harness (dsh) with automatic upstream-channel pinning: paste the key in Settings > Models, models are fetched and each one is locked to its channel after first use. Also strict/preferred pins, exclusions, failover before the first token, and read-back verification.",
   "type": "module",
   "main": "lib/index.js",
@@ -22,7 +22,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test test/pin.test.mjs test/wire.test.mjs test/log.test.mjs test/gateway.test.mjs test/panel.test.mjs test/state.test.mjs test/image.test.mjs",
+    "test": "node --test test/pin.test.mjs test/wire.test.mjs test/log.test.mjs test/gateway.test.mjs test/panel.test.mjs test/state.test.mjs test/image.test.mjs test/reasoning.test.mjs",
     "test:e2e": "node test/e2e.mjs"
   },
   "keywords": [
