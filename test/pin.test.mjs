@@ -2,6 +2,15 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { adherence, availableChannels, buildAttempts, canFailover, injectPin, isHonored, normalizeMode, probeBody, servedBy, servedByPipeline, spell } from '../lib/pin.js'
 
+test('1017 锁定 DeepSeek 时携带能力过滤，不影响其它渠道与自动路由', () => {
+  const body = { model: 'cline-pass/deepseek-v4.1-flash-1017' }
+  const locked = injectPin(body, buildAttempts({ upstreams: ['deepseek'] })[0])
+  assert.deepEqual(locked.providerOptions.gateway, { only: ['deepseek'], has: ['vision', 'implicit-caching'] })
+  assert.equal(injectPin(body, buildAttempts({ upstreams: ['pareto'] })[0]).providerOptions.gateway.has, undefined)
+  assert.equal(injectPin(body, buildAttempts({})[0]).providerOptions, undefined)
+  assert.equal(injectPin(body, buildAttempts({ upstreams: ['deepseek'] })[0], undefined, 'direct').providerOptions, undefined)
+})
+
 const body = { model: 'm', messages: [{ role: 'user', content: 'hi' }] }
 const attempt = (pin) => buildAttempts(pin)[0]
 

@@ -113,6 +113,16 @@ const failureOf = (result) => {
 }
 
 const scenarios = [
+  {
+    name: '1017 锁定 DeepSeek 时向真实宿主请求加入能力过滤',
+    model: 'cline-pass/deepseek-v4.1-flash-1017',
+    config: { perModel: { 'cline-pass/deepseek-v4.1-flash-1017': { upstreams: ['deepseek'], pinMode: 'strict' } } },
+    async check({ result }) {
+      assert.equal(failureOf(result), undefined)
+      assert.equal(finalText(result), 'Hello from deepseek')
+      assert.deepEqual(mainRequests()[0].body.providerOptions.gateway, { only: ['deepseek'], has: ['vision', 'implicit-caching'] })
+    },
+  },
   ...['off', 'low', 'high', 'max', 'medium'].map((effort) => ({
     name: `1017 思考强度 ${effort}：真实宿主解析模型能力并向网关发送对应参数`,
     model: 'cline-pass/deepseek-v4.1-flash-1017',

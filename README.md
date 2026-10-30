@@ -84,6 +84,8 @@ Cline Pass 的一个模型背后通常有好几个上游渠道（比如 `baseten
 
 ### 思考模式与强度
 
+锁定 `cline-pass/deepseek-v4.1-flash-1017` 的 `deepseek` 渠道时，插件会附加 `vision` 和 `implicit-caching` 能力过滤，促使网关遵守渠道限制。渠道不可用时仍按原有故障转移策略处理；实际响应渠道以日志为准。
+
 在聊天输入框底部点击模型名称，再打开「推理等级」。DeepSeek V4.1 Flash（包括 1017）和 V4 Pro 提供 **Off / Low / High / Max**，默认 **High**。Off 会显式关闭思考；Max 会按最高强度发送，不再降为 High。切换后从下一次请求生效。
 
 DeepSeek 的实际档位见[官方思考模式文档](https://api-docs.deepseek.com/zh-cn/guides/thinking_mode/)；已有配置中的 `medium` / `xhigh` 按 High 处理，`minimal` 按 Low，`ultra` 按 Max。
